@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kassya & Alana - Memórias</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            background-color: #150a14;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            color: #f7d6b5;
+        }
+        
+        /* Container Estritamente Mobile-First */
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: 450px;
+            max-height: 850px;
+            background: #251322;
+            position: relative;
+            border: 4px solid #3d1e34;
+            box-shadow: 0 0 30px rgba(0,0,0,0.9);
+            overflow: hidden;
+        }
+
+        /* UI de Progresso - Estrelas do Topo */
+        #ui-top {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+        }
+        .stars-row {
+            font-size: 24px;
+            letter-spacing: 2px;
+        }
+        .star {
+            color: #4a2840;
+            transition: color 0.4s, text-shadow 0.4s;
+        }
+        .star.active {
+            color: #ffb700;
+            text-shadow: 0 0 10px #ff7700;
+        }
+        .ui-subtitle {
+            font-size: 11px;
+            color: #a47599;
+            margin-top: 4px;
+        }
+
+        /* Cenário do Quarto Cozy */
+        #room {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: radial-gradient(circle at 50% 30%, #422037 0%, #1a0b18 80%);
+        }
+
+        /* Iluminação Âmbar do Objeto Atual */
+        #amber-glow {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 145, 0, 0.35);
+            box-shadow: 0 0 20px 15px rgba(255, 136, 0, 0.25);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 3;
+            display: block;
+            transition: top 0.5s ease, left 0.5s ease;
+            animation: pulse 1.6s infinite alternate;
+        }
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        }
+
+        /* Objetos Interativos */
+        .interactive-object {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            z-index: 4;
+            transform: translate(-50%, -50%);
+            opacity: 0.2;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+        .interactive-object.active {
+            opacity: 1;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        /* Posições baseadas no mapa visual */
+        #obj-1 { top: 60%; left: 25%; } /* Celular */
+        #obj-2 { top: 60%; left: 45%; } /* Cupuaçuzinho */
+        #obj-3 { top: 52%; left: 30%; } /* Caneca */
+        #obj-4 { top: 42%; left: 20%; } /* Lírios */
+        #obj-5 { top: 35%; left: 80%; } /* Música */
+        #obj-6 { top: 20%; left: 80%; } /* PC */
+        #obj-7 { top: 25%; left: 45%; } /* Livro */
+        #obj-8 { top: 48%; left: 75%; } /* Camisa */
+        #obj-9 { top: 22%; left: 20%; } /* Janela */
+
+        /* Personagem Chibi Kassya */
+        #kassya {
+            position: absolute;
+            width: 40px;
+            height: 55px;
+            background: #d49387; /* Tom terroso quente para a silhueta */
+            border: 3px solid #150a14;
+            border-radius: 12px 12px 4px 4px;
+            z-index: 5;
+            transform: translate(-50%, -100%);
+            transition: top 0.8s linear, left 0.8s linear;
+            box-shadow: 0 6px 6px rgba(0,0,0,0.5);
+        }
+        #kassya::after {
+            content: 'Kassya';
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3d1e34;
+            color: #f7d6b5;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #a47599;
+        }
+
+        /* Caixa de Memória Retrô Emocional */
+        #memory-box {
+            position: absolute;
+            bottom: 25px;
+            left: 5%;
+            width: 90%;
+            background: #2b1627;
+            border: 3px solid #ffb700;
+            border-radius: 10px;
+            padding: 18px;
+            display: none;
+            z-index: 20;
+            box-shadow: 0 0 25px rgba(0,0,0,0.9);
+            max-height: 65%;
+            overflow-y: auto;
+        }
+        .mem-title {
+            font-size: 14px;
+            color: #ffb700;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+        }
+        .mem-date {
+            font-size: 11px;
+            color: #a47599;
+            margin-bottom: 12px;
+        }
+        .mem-body {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #f7d6b5;
+            white-space: pre-line;
+        }
+        .btn-next {
+            display: block;
+            margin-top: 15px;
+            background: #4a2840;
+            color: #f7d6b5;
+            border: 1px solid #ffb700;
+            padding: 8px;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Customizações de texto específicas do roteiro */
+        .chat-row { margin-bottom: 8px; }
+        .alana { color: #ff9ebb; }
+        .kassya { color: #9ebeff; }
+        .footer-note { font-size: 11px; color: #8a6382; text-align: center; margin-top: 12px; font-style: italic; }
+        .list-item { margin-left: 10px; margin-top: 4px; }
+        .final-heart { text-align: center; color: #ff3366; font-size: 18px; margin-top: 10px; animation: pulse 0.6s infinite alternate; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="ui-top">
+        <div class="stars-row">
+            <span class="star" id="s1">★</span>
+            <span class="star" id="s2">★</span>
+            <span class="star" id="s3">★</span>
+            <span class="star" id="s4">★</span>
+            <span class="star" id="s5">★</span>
+            <span class="star" id="s6">★</span>
+            <span class="star" id="s7">★</span>
+            <span class="star" id="s8">★</span>
+            <span class="star" id="s9">★</span>
+        </div>
+        <div class="ui-subtitle">(memórias encontradas)</div>
+    </div>
+
+    <div id="room" onclick="handleFloorTap(event)">
+        <div id="amber-glow"></div>
+
+        <div class="interactive-object" id="obj-1">📱</div>
+        <div class="interactive-object" id="obj-2">🍈</div>
+        <div class="interactive-object" id="obj-3">☕</div>
+        <div class="interactive-object" id="obj-4">🌸</div>
+        <div class="interactive-object" id="obj-5">🎵</div>
+        <div class="interactive-object" id="obj-6">🖥️</div>
+        <div class="interactive-object" id="obj-7">📚</div>
+        <div class="interactive-object" id="obj-8">🧥</div>
+        <div class="interactive-object" id="obj-9">🌙</div>
+
+        <div id="kassya" style="top: 75%; left: 50%;"></div>
+    </div>
+
+    <div id="memory-box">
+        <div class="mem-title" id="m-title"></div>
+        <div class="mem-date" id="m-date"></div>
+        <div class="mem-body" id="m-body"></div>
+        <div class="btn-next" onclick="closeMemoryBox()">Seguir em frente... ❤️</div>
+    </div>
+</div>
+
+<script>
+    let currentStep = 1;
+    const totalSteps = 9;
+    let isMoving = false;
+
+    // Banco de dados estrito conforme regras fornecidas
+    const memoryData = {
+        1: {
+            title: "Celular",
+            date: "24/11/2025",
+            html: `<div class="chat-row"><span class="alana">Alana:</span> "Assiste animais fantásticos. É MUITO BOM!! TE DOU MINHA PALAVRA DE ESCOTEIRA."</div>
+                   <div class="chat-row"><span class="kassya">Kassya:</span> "Pera, tu já foi real escoteira?"</div>
+                   <div class="chat-row"><span class="alana">Alana:</span> "Não! Mas tenho a palavra deles."</div>
+                   <div class="footer-note">registrada para fins históricos 🤡</div>`
+        },
+        2: {
+            title: "Cupuaçuzinho",
+            date: "",
+            html: `"MEU CUPUAÇUZINHO..."`
+        },
+        3: {
+            title: "Caneca",
+            date: "",
+            html: `"Eu gosto das coisas grandes.\nMas acho que gosto ainda mais da ideia dos dias comuns com você."\n\n<div class="list-item">• mandar meme no expediente</div><div class="list-item">• escolher comida por 40 minutos</div><div class="list-item">• reclamar do sono</div><div class="list-item">• dividir silêncio confortável</div>\n<b>"Talvez casa também seja isso."</b>`
+        },
+        4: {
+            title: "Lírios",
+            date: "28/01/2026",
+            html: `"Uma vez você me disse que gostaria de ter flores em casa quando se mudar.\n\nEu não acho que precisamos esperar as condições perfeitas para fazer o que gostamos.\n\nSempre é tempo de criar novas tradições."`
+        },
+        5: {
+            title: "Música",
+            date: "",
+            html: `"Se carinho tivesse som, talvez fosse esse."\n\n<i>Música associada: Seu Balancê</i>`
+        },
+        6: {
+            title: "PC",
+            date: "",
+            html: `"Talvez você nunca veja as horas escondidas por trás disso.\nMas elas sempre foram suas."\n\n<span style="color: #ffb700;">[Mostrando ilustração de Alana programando]</span>`
+        },
+        7: {
+            title: "Livro",
+            date: "27/12/2025",
+            html: `<span style="color: #ff9ebb;">[Imagem: Kassya deitada com camisa do Flamengo]</span>\n\nLegenda: "Não é o seuuuuuu cheiro especificamente, mas ta bom demais."\n\n"Talvez amor também seja isso: encontrar conforto no que lembra alguém."`
+        },
+        8: {
+            title: "Camisa",
+            date: "",
+            html: `Texto na camisa: <b>"Dizem que o amor atrai"</b>\n\n"Tem coisas que carregam presença mesmo quando falta abraço."`
+        },
+        9: {
+            title: "Janela",
+            date: "Ainda por viver",
+            html: `<b>Coisas que ainda quero viver com você:</b>\n\n<div class="list-item">• ter flores em casa</div><div class="list-item">• cozinhar juntas e errar a receita</div><div class="list-item">• um domingo sem pressa</div><div class="list-item">• viagem improvisada</div><div class="list-item">• dormir vendo algo juntas</div><div class="list-item">• reclamar do sono tomando café</div><div class="list-item">• dividir silêncio confortável</div>\n<div class="final-heart">"Ainda tem tanta coisa esperando pela gente." ❤️</div>`
+        }
+    };
+
+    function updateGlowPosition() {
+        if (currentStep <= totalSteps) {
+            const targetObj = document.getElementById(`obj-${currentStep}`);
+            const glow = document.getElementById('amber-glow');
+            
+            // Ativa apenas o objeto correto da ordem estrita
+            document.querySelectorAll('.interactive-object').forEach(obj => obj.classList.remove('active'));
+            targetObj.classList.add('active');
+
+            // Move o brilho para o objeto atual
+            glow.style.top = targetObj.style.top;
+            glow.style.left = targetObj.style.left;
+            glow.style.display = "block";
+        } else {
+            document.getElementById('amber-glow').style.display = "none";
+        }
+    }
+
+    function handleFloorTap(event) {
+        if (isMoving || document.getElementById('memory-box').style.display === 'block') return;
+
+        const room = document.getElementById('room');
+        const rect = room.getBoundingClientRect();
+        
+        // Calcula a porcentagem do clique dentro do container do quarto
+        const tapX = ((event.clientX - rect.left) / rect.width) * 100;
+        const tapY = ((event.clientY - rect.top) / rect.height) * 100;
+
+        const targetObj = document.getElementById(`obj-${currentStep}`);
+        const objX = parseFloat(targetObj.style.left);
+        const objY = parseFloat(targetObj.style.top);
+
+        // Verifica proximidade do clique em relação ao objeto ativo para acionar
+        const distance = Math.sqrt(Math.pow(tapX - objX, 2) + Math.pow(tapY - objY, 2));
+
+        isMoving = true;
+        const kassya = document.getElementById('kassya');
+        
+        // Faz a Kassya andar até a posição do clique/objeto
+        kassya.style.left = `${tapX}%`;
+        kassya.style.top = `${tapY}%`;
+
+        setTimeout(() => {
+            isMoving = false;
+            // Se o clique foi perto o suficiente do objeto ativo, abre a memória
+            if (distance < 15) {
+                kassya.style.left = `${objX}%`;
+                kassya.style.top = `${objY}%`;
+                openMemoryBox();
+            }
+        }, 800);
+    }
+
+    function openMemoryBox() {
+        const data = memoryData[currentStep];
+        document.getElementById('m-title').innerHTML = data.title;
+        document.getElementById('m-date').innerHTML = data.date;
+        document.getElementById('m-body').innerHTML = data.html;
+        document.getElementById('memory-box').style.display = 'block';
+    }
+
+    function closeMemoryBox() {
+        document.getElementById('memory-box').style.display = 'none';
+        
+        // Acende a estrela correspondente no topo
+        document.getElementById(`s${currentStep}`).classList.add('active');
+        
+        currentStep++;
+        if (currentStep <= totalSteps) {
+            updateGlowPosition();
+        } else {
+            alert("Obrigado por reviver todas as memórias! O futuro espera por vocês. ✨");
+        }
+    }
+
+    // Inicialização do Game Loop
+    window.onload = () => {
+        updateGlowPosition();
+    };
+</script>
+
+</body>
+</html>
