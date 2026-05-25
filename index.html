@@ -1,3 +1,4 @@
+<!-- substituído pelo código fornecido pelo usuário -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -5,14 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kassya & Alana - Memórias</title>
     <style>
-        /* ESTÉTICA OBRIGATÓRIA: COZY RETRÔ QUENTE */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             user-select: none;
             -webkit-user-select: none;
-            image-rendering: pixelated; /* Força aspecto de pixel art */
         }
         body {
             background-color: #1a0f1a;
@@ -25,211 +24,146 @@
             color: #f7d6b5;
         }
         
-        /* CONTAINER VERTICAL MOBILE-FIRST (NÃO MODERNO, NÃO DASHBOARD) */
+        /* Container proporção exata da sua imagem (Mobile-First) */
         #game-container {
             width: 100vw;
-            height: 100vh;
-            max-width: 430px;
-            max-height: 850px;
-            background: #231221; 
+            height: calc(100vw * (1414 / 1000)); /* Mantém a proporção da arte 1000x1414 */
+            max-width: 450px;
+            max-height: 636px;
             position: relative;
-            border: 6px double #4a2840; /* Borda dupla estilo RPG retrô */
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.8);
+            box-shadow: 0 0 30px rgba(0,0,0,0.9);
             overflow: hidden;
+            background-image: url('https://Neves3012.github.io/k/image_0e219e.jpg'); /* Carrega sua imagem direto do repositório */
+            background-size: cover;
+            background-position: center;
         }
 
-        /* UI DE PROGRESSO - ESTRELAS DOURADAS DISCRETAS NO TOPO */
+        /* Estrelas discretas no topo */
         #ui-top {
             position: absolute;
-            top: 25px;
+            top: 12px;
             width: 100%;
             text-align: center;
             z-index: 10;
         }
         .stars-row {
-            font-size: 22px;
-            letter-spacing: 4px;
+            font-size: 18px;
+            letter-spacing: 3px;
         }
         .star {
-            color: #3d2235;
-            transition: color 0.5s, text-shadow 0.5s;
-            text-shadow: 1px 1px #000;
+            color: rgba(255, 255, 255, 0.2);
+            text-shadow: 1px 1px 2px #000;
         }
         .star.active {
             color: #ffcc00;
             text-shadow: 0 0 8px #ff9900, 1px 1px 2px #000;
         }
-        .ui-subtitle {
-            font-size: 10px;
-            color: #bfa3bb;
-            margin-top: 5px;
-            text-transform: lowercase;
-            letter-spacing: 1px;
-        }
 
-        /* CENÁRIO DO QUARTO COZY COM ILUMINAÇÃO ÂMBAR */
-        #room {
+        /* Camada interativa invisível que acompanha o tamanho da imagem */
+        #interactive-layer {
             width: 100%;
             height: 100%;
-            position: relative;
-            background: radial-gradient(circle at 50% 35%, #47263c 0%, #1c0e1a 90%);
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
-        /* APENAS UM OBJETO ILUMINADO POR VEZ */
+        /* Brilho Âmbar sobre os objetos desenhados */
         #amber-glow {
             position: absolute;
-            width: 65px;
-            height: 65px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             background: rgba(255, 140, 0, 0.4);
-            box-shadow: 0 0 25px 18px rgba(255, 120, 0, 0.3);
+            box-shadow: 0 0 15px 12px rgba(255, 120, 0, 0.35);
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 3;
             display: block;
-            transition: top 0.6s cubic-bezier(0.25, 1, 0.5, 1), left 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            animation: pulseGlow 1.4s infinite alternate;
+            animation: pulseGlow 1.2s infinite alternate;
         }
         @keyframes pulseGlow {
-            0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.7; }
+            0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.6; }
             100% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
         }
 
-        /* OBJETOS INTERATIVOS */
-        .interactive-object {
+        /* Botões invisíveis exatamente em cima dos itens da imagem */
+        .click-zone {
             position: absolute;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 26px;
-            z-index: 4;
+            width: 45px;
+            height: 45px;
             transform: translate(-50%, -50%);
-            opacity: 0.15;
-            transition: opacity 0.4s, transform 0.3s;
+            z-index: 4;
             pointer-events: none;
-            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5));
         }
-        .interactive-object.active {
-            opacity: 1;
+        .click-zone.active {
             pointer-events: auto;
-            cursor: pointer;
         }
 
-        /* POSIÇÕES DO MAPA COZY (Cama, Janela, PC, Mesa, Decoração) */
-        #obj-1 { top: 60%; left: 30%; } /* Celular */
-        #obj-2 { top: 62%; left: 55%; } /* Cupuaçuzinho */
-        #obj-3 { top: 52%; left: 35%; } /* Caneca */
-        #obj-4 { top: 44%; left: 20%; } /* Lírios */
-        #obj-5 { top: 35%; left: 80%; } /* Música */
-        #obj-6 { top: 20%; left: 78%; } /* PC */
-        #obj-7 { top: 24%; left: 45%; } /* Livro */
-        #obj-8 { top: 48%; left: 75%; } /* Camisa */
-        #obj-9 { top: 24%; left: 18%; } /* Janela */
+        /* Posições milimetricamente ajustadas com base no seu mapa visual (%) */
+        #obj-1 { top: 26.5%; left: 19.5%; } /* Celular */
+        #obj-2 { top: 27.5%; left: 13.5%; } /* Cupuaçuzinho */
+        #obj-3 { top: 25.5%; left: 10.5%; } /* Caneca */
+        #obj-4 { top: 17.5%; left: 19.5%; } /* Lírios */
+        #obj-5 { top: 22.5%; left: 83.5%; } /* Música */
+        #obj-6 { top: 9.0%; left: 83.5%; }  /* PC */
+        #obj-7 { top: 8.5%; left: 43.5%; }  /* Livro */
+        #obj-8 { top: 26.5%; left: 63.5%; } /* Camisa */
+        #obj-9 { top: 10.5%; left: 21.5%; } /* Janela */
 
-        /* PERSONAGEM CHIBI INSPIRADA NA KASSYA */
-        #kassya {
-            position: absolute;
-            width: 38px;
-            height: 58px;
-            background: #d49387; 
-            border: 3px solid #1a0f1a;
-            border-radius: 16px 16px 6px 6px;
-            z-index: 5;
-            transform: translate(-50%, -100%);
-            transition: top 0.7s ease-out, left 0.7s ease-out;
-            box-shadow: 0 8px 4px rgba(0,0,0,0.6);
-        }
-        /* Cabelo cacheado pixel/retrô aproximado por CSS */
-        #kassya::before {
-            content: '';
-            position: absolute;
-            top: -8px; left: -4px; width: 46px; height: 26px;
-            background: #543129;
-            border-radius: 12px;
-            border: 3px solid #1a0f1a;
-            z-index: -1;
-        }
-        /* Tag com o nome da protagonista */
-        #kassya::after {
-            content: 'KASSYA';
-            position: absolute;
-            top: -26px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #4a2840;
-            color: #f7d6b5;
-            font-size: 9px;
-            font-weight: bold;
-            padding: 1px 6px;
-            border-radius: 3px;
-            border: 1px solid #bfa3bb;
-            letter-spacing: 1px;
-        }
-
-        /* CAIXA DE DIÁLOGO / MEMÓRIA RETRÔ COZY */
+        /* Caixa de diálogo retrô idêntica ao estilo cozy */
         #memory-box {
             position: absolute;
-            bottom: 30px;
+            bottom: 15px;
             left: 5%;
             width: 90%;
-            background: #2d1729;
+            background: #231221;
             border: 3px solid #f7d6b5;
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 6px;
+            padding: 15px;
             display: none;
             z-index: 20;
-            box-shadow: 0 0 0 4px #2d1729, 0 10px 25px rgba(0,0,0,0.9);
-            max-height: 60%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            max-height: 50%;
             overflow-y: auto;
         }
         .mem-title {
-            font-size: 13px;
+            font-size: 12px;
             color: #ffaa00;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             text-transform: uppercase;
             font-weight: bold;
-            letter-spacing: 1px;
         }
         .mem-date {
             font-size: 10px;
             color: #a47599;
-            margin-bottom: 14px;
+            margin-bottom: 8px;
         }
         .mem-body {
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 13px;
+            line-height: 1.5;
             color: #f7d6b5;
             white-space: pre-line;
         }
         .btn-next {
             display: block;
-            margin-top: 18px;
+            margin-top: 12px;
             background: #4a2840;
             color: #f7d6b5;
-            border: 2px solid #ffaa00;
-            padding: 10px;
+            border: 1px solid #ffaa00;
+            padding: 6px;
             text-align: center;
             border-radius: 4px;
             font-size: 11px;
-            font-weight: bold;
             cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: background 0.2s;
-        }
-        .btn-next:active {
-            background: #5e3251;
         }
 
-        /* FORMATAÇÃO ESTRITA DOS TEXTOS DO ROTEIRO */
-        .chat-row { margin-bottom: 10px; font-size: 13.5px; }
+        .chat-row { margin-bottom: 6px; }
         .alana { color: #ff9ebb; font-weight: bold; }
         .kassya-name { color: #9ebeff; font-weight: bold; }
-        .footer-note { font-size: 11px; color: #8a6382; text-align: center; margin-top: 14px; font-style: italic; }
-        .list-item { margin-left: 8px; margin-top: 5px; color: #f2c194; }
-        .final-heart { text-align: center; color: #ff3366; font-size: 16px; margin-top: 15px; font-weight: bold; }
+        .footer-note { font-size: 10px; color: #8a6382; text-align: center; margin-top: 10px; font-style: italic; }
+        .list-item { margin-left: 5px; margin-top: 3px; color: #f2c194; }
+        .final-heart { text-align: center; color: #ff3366; font-size: 14px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -247,23 +181,20 @@
             <span class="star" id="s8">★</span>
             <span class="star" id="s9">★</span>
         </div>
-        <div class="ui-subtitle">(memórias encontradas)</div>
     </div>
 
-    <div id="room" onclick="handleFloorTap(event)">
+    <div id="interactive-layer" onclick="handleMapTap(event)">
         <div id="amber-glow"></div>
 
-        <div class="interactive-object" id="obj-1">📱</div>
-        <div class="interactive-object" id="obj-2">🍈</div>
-        <div class="interactive-object" id="obj-3">☕</div>
-        <div class="interactive-object" id="obj-4">🌸</div>
-        <div class="interactive-object" id="obj-5">🎵</div>
-        <div class="interactive-object" id="obj-6">🖥️</div>
-        <div class="interactive-object" id="obj-7">📚</div>
-        <div class="interactive-object" id="obj-8">🧥</div>
-        <div class="interactive-object" id="obj-9">🌙</div>
-
-        <div id="kassya" style="top: 75%; left: 50%;"></div>
+        <div class="click-zone" id="obj-1"></div>
+        <div class="click-zone" id="obj-2"></div>
+        <div class="click-zone" id="obj-3"></div>
+        <div class="click-zone" id="obj-4"></div>
+        <div class="click-zone" id="obj-5"></div>
+        <div class="click-zone" id="obj-6"></div>
+        <div class="click-zone" id="obj-7"></div>
+        <div class="click-zone" id="obj-8"></div>
+        <div class="click-zone" id="obj-9"></div>
     </div>
 
     <div id="memory-box">
@@ -277,57 +208,55 @@
 <script>
     let currentStep = 1;
     const totalSteps = 9;
-    let isMoving = false;
 
-    // CONTEÚDOS EXATOS E ORDEM EMOCIONAL OBRIGATÓRIA
     const memoryData = {
         1: {
-            title: "1. Celular",
+            title: "Celular",
             date: "24/11/2025",
-            html: `<div class="chat-row"><span class="alana">Alana:</span> "Assiste animais fantásticos. É MUITO BOM!! TE DOU MINHA PALAVRA DE ESCOTEIRA."</div>
-                   <div class="chat-row"><span class="kassya-name">Kassya:</span> "Pera, tu já foi real escoteira?"</div>
-                   <div class="chat-row"><span class="alana">Alana:</span> "Não! Mas tenho a palavra deles."</div>
+            html: `<div class="chat-row"><span class="alana">Alana:</span> “Assiste animais fantásticos. É MUITO BOM!! TE DOU MINHA PALAVRA DE ESCOTEIRA.”</div>
+                   <div class="chat-row"><span class="kassya-name">Kassya:</span> “Pera, tu já foi real escoteira?”</div>
+                   <div class="chat-row"><span class="alana">Alana:</span> “Não! Mas tenho a palavra deles.”</div>
                    <div class="footer-note">registrada para fins históricos 🤡</div>`
         },
         2: {
-            title: "2. Cupuaçuzinho",
+            title: "Cupuaçuzinho",
             date: "",
-            html: `"MEU CUPUAÇUZINHO..."`
+            html: `“MEU CUPUAÇUZINHO...”`
         },
         3: {
-            title: "3. Caneca",
-            date: "Dias comuns / rotina / aconchego",
-            html: `"Eu gosto das coisas grandes.\nMas acho que gosto ainda mais da ideia dos dias comuns com você."\n\n<div class="list-item">• mandar meme no expediente</div><div class="list-item">• escolher comida por 40 minutos</div><div class="list-item">• reclamar do sono</div><div class="list-item">• dividir silêncio confortável</div>\n<b>"Talvez casa também seja isso."</b>`
+            title: "Caneca",
+            date: "Dias comuns / rotina",
+            html: `“Eu gosto das coisas grandes.\nMas acho que gosto ainda mais da idea dos dias comuns com você.”\n\n<div class="list-item">• mandar meme no expediente</div><div class="list-item">• escolher comida por 40 minutos</div><div class="list-item">• reclamar do sono</div><div class="list-item">• dividir silêncio confortável</div>\n<b>“Talvez casa também seja isso.”</b>`
         },
         4: {
-            title: "4. Lírios",
+            title: "Lírios",
             date: "28/01/2026",
-            html: `"Uma vez você me disse que gostaria de ter flores em casa quando se mudar.\n\nEu não acho que precisamos esperar as condições perfeitas para fazer o que gostamos.\n\nSempre é tempo de criar novas tradições."`
+            html: `“Uma vez você me disse que gostaria de ter flores em casa quando se mudar.\n\nEu não acho que precisamos esperar as condições perfeitas para fazer o que gostamos.\n\nSempre é tempo de criar novas tradições.”`
         },
         5: {
-            title: "5. Música",
+            title: "Música",
             date: "",
-            html: `"Se carinho tivesse som, talvez fosse esse."\n\n<span style="color:#ffaa00;">Música associada:</span> <b>Seu Balancê</b> 🎵`
+            html: `“Se carinho tivesse som, talvez fosse esse.”\n\nMúsica associada: <b>Seu Balancê</b>`
         },
         6: {
-            title: "6. PC",
+            title: "PC",
             date: "",
-            html: `"Talvez você nunca veja as horas escondidas por trás disso.\nMas elas sempre foram suas."\n\n<span style="color: #ff9ebb; font-style: italic;">[Mostrando ilustração de Alana programando]</span>`
+            html: `“Talvez você nunca veja as horas escondidas por trás disso.\nMas elas sempre foram suas.”\n\n<span style="color: #ff9ebb;">[Mostrando ilustração de Alana programando]</span>`
         },
         7: {
-            title: "7. Livro",
+            title: "Livro",
             date: "27/12/2025",
-            html: `<span style="color: #ff9ebb;">[Imagem: Kassya deitada com camisa do Flamengo]</span>\n\nLegenda: "Não é o seuuuuuu cheiro especificamente, mas ta bom demais."\n\n"Talvez amor também seja isso: encontrar conforto no que lembra alguém."`
+            html: `<span style="color: #ff9ebb;">[Imagem: Kassya deitada com camisa do Flamengo]</span>\n\nLegenda: “Não é o seuuuuuu cheiro especificamente, mas ta bom demais.”\n\n“Talvez amor também seja isso: encontrar conforto no que lembra alguém.”`
         },
         8: {
-            title: "8. Camisa",
+            title: "Camisa",
             date: "",
-            html: `Texto na camisa: <i>"Dizem que o amor atrai"</i>\n\n"Tem coisas que carregam presença mesmo quando falta abraço."`
+            html: `Texto na camisa: <i>“Dizem que o amor atrai”</i>\n\n“Tem coisas que carregam presença mesmo quando falta abraço.”`
         },
         9: {
-            title: "9. Janela (Final)",
+            title: "Janela (Final)",
             date: "Ainda por viver",
-            html: `<b>Coisas que ainda quero viver com você:</b>\n\n<div class="list-item">• ter flores em casa</div><div class="list-item">• cozinhar juntas e errar a receita</div><div class="list-item">• um domingo sem pressa</div><div class="list-item">• viagem improvisada</div><div class="list-item">• dormir vendo algo juntas</div><div class="list-item">• reclamar do sono tomando café</div><div class="list-item">• dividir silêncio confortável</div>\n<div class="final-heart">"Ainda tem tanta coisa esperando pela gente." ❤️</div>`
+            html: `<b>Coisas que ainda quero viver com você:</b>\n\n<div class="list-item">• ter flores em casa</div><div class="list-item">• cozinhar juntas e errar a receita</div><div class="list-item">• um domingo sem pressa</div><div class="list-item">• viagem improvisada</div><div class="list-item">• dormir vendo algo juntas</div><div class="list-item">• reclamar do sono tomando café</div><div class="list-item">• dividir silêncio confortável</div>\n<div class="final-heart">“Ainda tem tanta coisa esperando pela gente.” ❤️</div>`
         }
     };
 
@@ -336,24 +265,21 @@
             const targetObj = document.getElementById(`obj-${currentStep}`);
             const glow = document.getElementById('amber-glow');
             
-            // Ativa apenas o objeto correto da ordem estrita
-            document.querySelectorAll('.interactive-object').forEach(obj => obj.classList.remove('active'));
+            document.querySelectorAll('.click-zone').forEach(obj => obj.classList.remove('active'));
             targetObj.classList.add('active');
 
-            // Move o brilho para o objeto atual
             glow.style.top = targetObj.style.top;
             glow.style.left = targetObj.style.left;
-            glow.style.display = "block";
         } else {
             document.getElementById('amber-glow').style.display = "none";
         }
     }
 
-    function handleFloorTap(event) {
-        if (isMoving || document.getElementById('memory-box').style.display === 'block') return;
+    function handleMapTap(event) {
+        if (document.getElementById('memory-box').style.display === 'block') return;
 
-        const room = document.getElementById('room');
-        const rect = room.getBoundingClientRect();
+        const layer = document.getElementById('interactive-layer');
+        const rect = layer.getBoundingClientRect();
         
         const tapX = ((event.clientX - rect.left) / rect.width) * 100;
         const tapY = ((event.clientY - rect.top) / rect.height) * 100;
@@ -364,21 +290,10 @@
 
         const distance = Math.sqrt(Math.pow(tapX - objX, 2) + Math.pow(tapY - objY, 2));
 
-        isMoving = true;
-        const kassya = document.getElementById('kassya');
-        
-        kassya.style.left = `${tapX}%`;
-        kassya.style.top = `${tapY}%`;
-
-        setTimeout(() => {
-            isMoving = false;
-            // TAP-TO-MOVE: Se tocou perto ou em cima do objeto da vez, ativa!
-            if (distance < 16) {
-                kassya.style.left = `${objX}%`;
-                kassya.style.top = `${objY}%`;
-                openMemoryBox();
-            }
-        }, 700);
+        // TAP-TO-MOVE simplificado sobre a imagem de fundo fixa
+        if (distance < 8) {
+            openMemoryBox();
+        }
     }
 
     function openMemoryBox() {
@@ -394,9 +309,7 @@
         document.getElementById(`s${currentStep}`).classList.add('active');
         
         currentStep++;
-        if (currentStep <= totalSteps) {
-            updateGlowPosition();
-        }
+        updateGlowPosition();
     }
 
     window.onload = () => {
