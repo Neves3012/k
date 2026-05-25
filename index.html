@@ -186,6 +186,9 @@
     <div id="interactive-layer" onclick="handleMapTap(event)">
         <div id="amber-glow"></div>
 
+        <!-- Personagem chibi visível -->
+        <div id="kassya" style="top:75%; left:50%;"></div>
+
         <div class="click-zone" id="obj-1"></div>
         <div class="click-zone" id="obj-2"></div>
         <div class="click-zone" id="obj-3"></div>
@@ -208,6 +211,14 @@
 <script>
     let currentStep = 1;
     const totalSteps = 9;
+    let isMoving = false;
+
+    // Estilo e comportamento do personagem (CSS via JS-inserted class fallback se necessário)
+    (function insertKassyaStyles(){
+        const s = document.createElement('style');
+        s.textContent = `#kassya{position:absolute;width:38px;height:58px;background:#d49387;border:3px solid #1a0f1a;border-radius:16px 16px 6px 6px;z-index:6;transform:translate(-50%,-100%);transition:top 0.7s ease,left 0.7s ease;box-shadow:0 8px 4px rgba(0,0,0,0.6);}#kassya::before{content:'';position:absolute;top:-8px;left:-4px;width:46px;height:26px;background:#543129;border-radius:12px;border:3px solid #1a0f1a;z-index:-1;}#kassya::after{content:'KASSYA';position:absolute;top:-26px;left:50%;transform:translateX(-50%);background:#4a2840;color:#f7d6b5;font-size:9px;font-weight:bold;padding:1px 6px;border-radius:3px;border:1px solid #bfa3bb;letter-spacing:1px;}`;
+        document.head.appendChild(s);
+    })();
 
     const memoryData = {
         1: {
@@ -270,13 +281,14 @@
 
             glow.style.top = targetObj.style.top;
             glow.style.left = targetObj.style.left;
+            glow.style.display = 'block';
         } else {
             document.getElementById('amber-glow').style.display = "none";
         }
     }
 
     function handleMapTap(event) {
-        if (document.getElementById('memory-box').style.display === 'block') return;
+        if (document.getElementById('memory-box').style.display === 'block' || isMoving) return;
 
         const layer = document.getElementById('interactive-layer');
         const rect = layer.getBoundingClientRect();
@@ -284,16 +296,28 @@
         const tapX = ((event.clientX - rect.left) / rect.width) * 100;
         const tapY = ((event.clientY - rect.top) / rect.height) * 100;
 
+        const kassya = document.getElementById('kassya');
+        // move personagem até o ponto tocado
+        isMoving = true;
+        kassya.style.left = `${tapX}%`;
+        kassya.style.top = `${tapY}%`;
+
         const targetObj = document.getElementById(`obj-${currentStep}`);
         const objX = parseFloat(targetObj.style.left);
         const objY = parseFloat(targetObj.style.top);
 
         const distance = Math.sqrt(Math.pow(tapX - objX, 2) + Math.pow(tapY - objY, 2));
 
-        // TAP-TO-MOVE simplificado sobre a imagem de fundo fixa
-        if (distance < 8) {
-            openMemoryBox();
-        }
+        // após movimento (durar 700ms por CSS), verifica se estava perto o suficiente
+        setTimeout(() => {
+            isMoving = false;
+            if (distance < 8) {
+                // centraliza exatamente no objeto antes de abrir
+                kassya.style.left = `${objX}%`;
+                kassya.style.top = `${objY}%`;
+                setTimeout(openMemoryBox, 250);
+            }
+        }, 750);
     }
 
     function openMemoryBox() {
